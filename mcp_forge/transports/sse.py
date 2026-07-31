@@ -5,7 +5,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from typing import TYPE_CHECKING, AsyncGenerator
+from typing import TYPE_CHECKING, Any, AsyncGenerator
 
 if TYPE_CHECKING:
     from mcp_forge.core.forge import Forge
@@ -26,7 +26,7 @@ class SseTransport:
 
     def start(self, reload: bool = False) -> None:
         try:
-            from fastapi import FastAPI
+            from fastapi import FastAPI, Body
             from fastapi.responses import StreamingResponse
             import uvicorn
         except ImportError as e:
@@ -38,17 +38,25 @@ class SseTransport:
         api = FastAPI(title=f"{self.app.name} (SSE)", version=self.app.version)
         forge = self.app
 
+        @api.get("/health")
+        async def health() -> dict[str, str]:
+            return {"status": "ok", "server": forge.name, "version": forge.version}
+
         @api.post("/tools/{tool_name}/stream")
-        async def stream_tool(tool_name: str, body: dict) -> StreamingResponse:
+        async def stream_tool(
+            tool_name: str,
+            body: dict[str, Any] = Body(default_factory=dict),
+        ) -> StreamingResponse:
             async def event_generator() -> AsyncGenerator[str, None]:
                 try:
                     result = await forge.call_tool(tool_name, body)
                     payload = json.dumps({"type": "result", "data": result})
                     yield f"data: {payload}\n\n"
                 except Exception as e:
+                    logger.error("SSE tool '%s' raised: %s", tool_name, e)
                     error = json.dumps({"type": "error", "message": str(e)})
                     yield f"data: {error}\n\n"
-                yield "data: {\"type\": \"done\"}\n\n"
+                yield 'data: {"type": "done"}\n\n'
 
             return StreamingResponse(event_generator(), media_type="text/event-stream")
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import copy
 import logging
+import sys
 from typing import Any, Callable
 
 from mcp_forge.core.config import ForgeConfig
@@ -46,7 +47,11 @@ class Forge:
         self._setup_logging()
 
     def _setup_logging(self) -> None:
+        # CRITICAL: always emit to stderr — stdout is the MCP wire on STDIO transport.
+        # basicConfig is a no-op if a handler is already configured, so this is safe
+        # to call even when StdioTransport also configures logging.
         logging.basicConfig(
+            stream=sys.stderr,
             level=getattr(logging, self.config.log_level.upper(), logging.INFO),
             format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
         )
@@ -89,11 +94,11 @@ class Forge:
         """
         Include a contrib router (memory, filesystem, web, etc.).
 
-        Tools are deep-copied so each Forge instance gets its own
+        Tools are shallow-copied so each Forge instance gets its own
         independent tool registry — no shared mutable state between apps.
         """
         for tool_name, tool_def in router._tools.items():
-            # Deep copy the metadata dict; keep the function reference intact
+            # copy.copy preserves function reference but isolates the metadata dict
             entry = copy.copy(tool_def)
             self._tools[tool_name] = entry
             logger.debug("Included contrib tool: %s from %s", tool_name, router.name)

@@ -33,7 +33,26 @@ def validate_input(params: dict[str, Any], schema: dict[str, Any]) -> dict[str, 
 
 
 def validate_output(result: Any, schema: dict[str, Any]) -> Any:
-    """Validate tool output — currently passthrough, extensible."""
+    """
+    Validate tool output against the declared return schema.
+
+    Currently enforces:
+    - Non-null guard: if the return schema is not nullable and result is None,
+      raise ValidationError to surface silent bugs early.
+
+    Extensible: add Pydantic model coercion, JSON Schema output validation, etc.
+    """
+    output_schema = schema.get("output", {})
+    nullable = output_schema.get("nullable", False)
+    output_type = output_schema.get("type")
+
+    # Null guard — catch tools that silently return None when they shouldn't
+    if result is None and not nullable and output_type not in ("null", None):
+        raise ValidationError(
+            f"Tool returned None but return type is '{output_type}' (non-nullable). "
+            "Add '-> None' or 'Optional[...]' to the return annotation if this is intentional."
+        )
+
     return result
 
 

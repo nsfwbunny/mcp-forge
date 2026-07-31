@@ -3,9 +3,11 @@
 > The FastAPI-style framework for building MCP servers in Python.
 
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg?style=flat-square)](https://www.python.org)
+[![PyPI](https://img.shields.io/pypi/v/mcp-forge.svg?style=flat-square)](https://pypi.org/project/mcp-forge/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
 [![MCP](https://img.shields.io/badge/protocol-MCP%202024--11--05-purple.svg?style=flat-square)](https://modelcontextprotocol.io)
 [![CI](https://img.shields.io/github/actions/workflow/status/nsfwbunny/mcp-forge/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/nsfwbunny/mcp-forge/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/nsfwbunny/mcp-forge?style=flat-square)](https://codecov.io/gh/nsfwbunny/mcp-forge)
 [![Stars](https://img.shields.io/github/stars/nsfwbunny/mcp-forge?style=flat-square)](https://github.com/nsfwbunny/mcp-forge/stargazers)
 
 Stop writing boilerplate MCP servers. `mcp-forge` lets you declare tools with a single decorator — schema, validation, and transport are handled automatically.
@@ -39,6 +41,7 @@ That's it. No JSON schema by hand. No transport boilerplate. No config files.
 | **Hot reload** | `--reload` flag for development |
 | **CLI** | `mcp-forge new`, `mcp-forge run`, `mcp-forge build` |
 | **Zero config** | Sensible defaults, override when needed |
+| **PEP 561 typed** | Ships `py.typed` — full mypy/pyright support out of the box |
 
 ---
 
@@ -97,19 +100,19 @@ mcp-forge run --transport sse --port 8080
 mcp-forge
 ├── core/
 │   ├── forge.py          # Main Forge class — app entrypoint
-│   ├── tool.py           # @tool decorator + ToolRegistry
 │   ├── schema.py         # Auto JSON Schema from type hints (Pydantic v2)
-│   └── validator.py      # Input/output validation engine
+│   ├── validator.py      # Input/output validation engine
+│   ├── config.py         # ForgeConfig dataclass
+│   └── exceptions.py     # Exception hierarchy
 ├── transports/
 │   ├── stdio.py          # STDIO transport (Claude Desktop compatible)
 │   ├── http.py           # FastAPI-based HTTP transport
 │   └── sse.py            # Server-Sent Events transport
 ├── cli/
-│   ├── main.py           # Typer CLI — new, run, build, list
-│   └── templates/        # Project scaffolding templates
+│   └── main.py           # Typer CLI — new, run, build, list
 └── contrib/
-    ├── memory.py         # Built-in memory tool
-    ├── filesystem.py     # Built-in filesystem tools
+    ├── memory.py         # Built-in memory tool (isolated per-instance store)
+    ├── filesystem.py     # Built-in filesystem tools (read, write, list, delete)
     └── web.py            # Built-in web fetch tool
 ```
 
@@ -124,8 +127,8 @@ from mcp_forge import Forge
 from mcp_forge.contrib import memory, filesystem, web
 
 app = Forge(name="full-server")
-app.include(memory)      # remember(), recall(), forget()
-app.include(filesystem)  # read_file(), write_file(), list_dir()
+app.include(memory)      # remember(), recall(), forget(), list_memory()
+app.include(filesystem)  # read_file(), write_file(), list_dir(), path_exists(), delete_file()
 app.include(web)         # fetch_url()
 ```
 
@@ -206,6 +209,8 @@ async def test_add_async():
 - [x] Pydantic v2 validation
 - [x] CLI (`new`, `run`, `build`)
 - [x] Contrib routers (memory, filesystem, web)
+- [x] PEP 561 `py.typed` marker
+- [x] Python 3.11 / 3.12 / 3.13 tested
 - [ ] `@resource` decorator (MCP Resources spec)
 - [ ] `@prompt` decorator (MCP Prompts spec)
 - [ ] Plugin registry (community contrib tools)
