@@ -2,10 +2,10 @@
 
 > The FastAPI-style framework for building MCP servers in Python.
 
-[![PyPI version](https://img.shields.io/pypi/v/mcp-forge.svg?style=flat-square&color=0ea5e9)](https://pypi.org/project/mcp-forge/)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg?style=flat-square)](https://www.python.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![MCP](https://img.shields.io/badge/protocol-MCP%201.0-purple.svg?style=flat-square)](https://modelcontextprotocol.io)
+[![MCP](https://img.shields.io/badge/protocol-MCP%202024--11--05-purple.svg?style=flat-square)](https://modelcontextprotocol.io)
+[![CI](https://img.shields.io/github/actions/workflow/status/nsfwbunny/mcp-forge/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/nsfwbunny/mcp-forge/actions)
 [![Stars](https://img.shields.io/github/stars/nsfwbunny/mcp-forge?style=flat-square)](https://github.com/nsfwbunny/mcp-forge/stargazers)
 
 Stop writing boilerplate MCP servers. `mcp-forge` lets you declare tools with a single decorator — schema, validation, and transport are handled automatically.
@@ -126,7 +126,7 @@ from mcp_forge.contrib import memory, filesystem, web
 app = Forge(name="full-server")
 app.include(memory)      # remember(), recall(), forget()
 app.include(filesystem)  # read_file(), write_file(), list_dir()
-app.include(web)         # fetch_url(), search_web()
+app.include(web)         # fetch_url()
 ```
 
 ---
@@ -176,6 +176,11 @@ client = ForgeTestClient(app)
 def test_add():
     result = client.call("add", {"a": 2, "b": 3})
     assert result == 5
+
+# Inside async tests:
+async def test_add_async():
+    result = await client.acall("add", {"a": 2, "b": 3})
+    assert result == 5
 ```
 
 ---
@@ -195,11 +200,12 @@ def test_add():
 ## 📦 Roadmap
 
 - [x] `@tool` decorator with auto-schema
-- [x] STDIO transport
+- [x] STDIO transport (MCP spec `2024-11-05`)
 - [x] HTTP transport (FastAPI)
 - [x] SSE transport
 - [x] Pydantic v2 validation
 - [x] CLI (`new`, `run`, `build`)
+- [x] Contrib routers (memory, filesystem, web)
 - [ ] `@resource` decorator (MCP Resources spec)
 - [ ] `@prompt` decorator (MCP Prompts spec)
 - [ ] Plugin registry (community contrib tools)

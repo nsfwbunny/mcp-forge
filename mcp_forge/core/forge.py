@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-import inspect
+import copy
 import logging
 from typing import Any, Callable
 
@@ -86,16 +86,25 @@ class Forge:
         return decorator
 
     def include(self, router: Any) -> None:
-        """Include a contrib router (memory, filesystem, web, etc.)"""
+        """
+        Include a contrib router (memory, filesystem, web, etc.).
+
+        Tools are deep-copied so each Forge instance gets its own
+        independent tool registry — no shared mutable state between apps.
+        """
         for tool_name, tool_def in router._tools.items():
-            self._tools[tool_name] = tool_def
-            logger.debug("Included contrib tool: %s", tool_name)
+            # Deep copy the metadata dict; keep the function reference intact
+            entry = copy.copy(tool_def)
+            self._tools[tool_name] = entry
+            logger.debug("Included contrib tool: %s from %s", tool_name, router.name)
         self._routers.append(router)
 
     async def call_tool(self, name: str, params: dict[str, Any]) -> Any:
         """Execute a registered tool by name with validated params."""
         if name not in self._tools:
-            raise ToolNotFoundError(f"Tool '{name}' not found. Available: {list(self._tools.keys())}")
+            raise ToolNotFoundError(
+                f"Tool '{name}' not found. Available: {list(self._tools.keys())}"
+            )
 
         tool_def = self._tools[name]
         validated = validate_input(params, tool_def["schema"])
@@ -109,7 +118,7 @@ class Forge:
         return validate_output(result, tool_def["schema"])
 
     def list_tools(self) -> list[dict[str, Any]]:
-        """Return a list of all registered tools with their schemas."""
+        """Return all registered tools with their MCP-compatible schemas."""
         return [
             {
                 "name": t["name"],
@@ -127,9 +136,12 @@ class Forge:
         port: int | None = None,
         reload: bool = False,
     ) -> None:
-        """Start the MCP server."""
+        """Start the MCP server with the configured transport."""
         transport = transport or self.config.transport
-        logger.info("Starting mcp-forge server '%s' v%s [transport=%s]", self.name, self.version, transport)
+        logger.info(
+            "Starting mcp-forge '%s' v%s [transport=%s]",
+            self.name, self.version, transport,
+        )
 
         if transport == "stdio":
             from mcp_forge.transports.stdio import StdioTransport

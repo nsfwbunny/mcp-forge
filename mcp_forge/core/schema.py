@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import inspect
+import typing
 from typing import Any, get_type_hints
 
 
@@ -20,9 +21,16 @@ _PYTHON_TO_JSON_TYPE: dict[Any, str] = {
 def build_schema(fn: Any) -> dict[str, Any]:
     """
     Build a JSON Schema dict from a Python function's type hints.
-    Supports primitives, list[T], dict[str, T], and Pydantic BaseModel.
+    Supports primitives, list[T], dict[str, T], Optional[T],
+    and Pydantic BaseModel parameters.
+
+    Falls back gracefully for parameters without type annotations.
     """
-    hints = get_type_hints(fn)
+    try:
+        hints = get_type_hints(fn)
+    except Exception:
+        hints = {}
+
     sig = inspect.signature(fn)
     properties: dict[str, Any] = {}
     required: list[str] = []
@@ -52,8 +60,6 @@ def build_schema(fn: Any) -> dict[str, Any]:
 
 def _resolve_type(annotation: Any) -> dict[str, Any]:
     """Recursively resolve a Python type annotation to a JSON Schema fragment."""
-    import typing
-
     origin = getattr(annotation, "__origin__", None)
 
     # list[T]
@@ -66,7 +72,7 @@ def _resolve_type(annotation: Any) -> dict[str, Any]:
         args = getattr(annotation, "__args__", (Any, Any))
         return {"type": "object", "additionalProperties": _resolve_type(args[1])}
 
-    # Optional[T] = Union[T, None]
+    # Optional[T] / Union[T, None]
     if origin is typing.Union:
         args = getattr(annotation, "__args__", ())
         non_none = [a for a in args if a is not type(None)]
@@ -74,8 +80,10 @@ def _resolve_type(annotation: Any) -> dict[str, Any]:
             resolved = _resolve_type(non_none[0])
             resolved["nullable"] = True
             return resolved
+        # Multi-union: return anyOf
+        return {"anyOf": [_resolve_type(a) for a in non_none]}
 
-    # Pydantic BaseModel
+    # Pydantic BaseModel — lazy import so pydantic is optional
     try:
         from pydantic import BaseModel
         if isinstance(annotation, type) and issubclass(annotation, BaseModel):
@@ -83,6 +91,6 @@ def _resolve_type(annotation: Any) -> dict[str, Any]:
     except ImportError:
         pass
 
-    # Primitive
+    # Primitive fallback
     json_type = _PYTHON_TO_JSON_TYPE.get(annotation, "string")
     return {"type": json_type}
