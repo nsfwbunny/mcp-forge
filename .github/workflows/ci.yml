@@ -17,12 +17,21 @@ jobs:
       - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: pip install -e ".[dev]"
+
+      - name: Format check
+        run: ruff format --check .
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Type check
+        run: mypy mcp_forge
 
       - name: Run tests with coverage
         run: pytest --tb=short -v --cov=mcp_forge --cov-report=xml --cov-report=term-missing
@@ -30,15 +39,11 @@ jobs:
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'
         uses: codecov/codecov-action@v7
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           files: coverage.xml
           fail_ci_if_error: false
-
-      - name: Lint
-        run: ruff check .
-
-      - name: Type check
-        run: mypy mcp_forge --ignore-missing-imports
 
   publish:
     needs: test
@@ -46,7 +51,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && startsWith(github.event.head_commit.message, 'release:')
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       - run: pip install hatch
