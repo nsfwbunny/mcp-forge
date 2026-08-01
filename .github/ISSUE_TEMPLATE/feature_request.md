@@ -1,17 +1,31 @@
 ---
 name: Feature request
-about: Suggest an idea for mcp-forge
+about: Propose a new feature or improvement
+title: '[feat] '
 labels: enhancement
+assignees: ''
 ---
 
 ## Problem
 
-A clear and concise description of what the problem is.
+What problem does this feature solve? Who benefits?
 
-## Proposed Solution
+## Proposed solution
 
-A clear and concise description of what you want to happen.
+Describe the feature. Include API sketch if relevant:
 
-## Alternatives
+```python
+# Example of how the API would look
+```
 
-Alternative solutions or features you've considered.
+## Alternatives considered
+
+Other approaches you considered and why you ruled them out.
+
+## Roadmap alignment
+
+Which roadmap milestone does this fit? (v0.2.0 / v0.3.0 / v1.0.0 / new)
+
+## Additional context
+
+Links, prior art, related issues.

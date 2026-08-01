@@ -1,25 +1,36 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Something isn't working as expected
+title: '[bug] '
 labels: bug
+assignees: ''
 ---
 
-## Bug Description
+## Description
 
-A clear and concise description of the bug.
+A clear description of the bug.
 
-## To Reproduce
+## Reproduction
 
 ```python
 # Minimal reproducible example
 ```
 
-## Expected Behavior
+## Expected behavior
 
 What you expected to happen.
 
+## Actual behavior
+
+What actually happened. Include full traceback if applicable.
+
 ## Environment
 
-- mcp-forge version:
+- mcp-forge version: <!-- pip show mcp-forge -->
 - Python version:
 - OS:
+- Transport used: <!-- stdio / http / sse -->
+
+## Additional context
+
+Anything else that might help.

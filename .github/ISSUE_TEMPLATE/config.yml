@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussions (Q&A, ideas, show & tell)
+    url: https://github.com/nsfwbunny/mcp-forge/discussions
+    about: Use Discussions for questions, ideas, and sharing what you built with mcp-forge.
+  - name: 📚 Documentation
+    url: https://github.com/nsfwbunny/mcp-forge#readme
+    about: Check the README before opening an issue.
