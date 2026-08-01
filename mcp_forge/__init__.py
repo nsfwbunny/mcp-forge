@@ -2,7 +2,7 @@
 mcp-forge — The FastAPI-style framework for building MCP servers in Python.
 """
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __author__ = "Benni Alencar"
 __license__ = "MIT"
 

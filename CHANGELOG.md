@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] — 2026-08-01
+
+### Changed
+- `actions/setup-python` bumped from v5 to v7 in all CI jobs
+- `actions/checkout` bumped from v4 to v7
+- `codecov/codecov-action` bumped from v4 to v7
+- `mypy` step now runs without `--ignore-missing-imports` — honours `strict = true` in `pyproject.toml`
+- CI step order enforced: format check → lint → type check → tests → coverage upload
+
+### Added
+- Python 3.13 officially supported and added to CI matrix classifiers
+- `Typing :: Typed` PyPI classifier (signals `py.typed` marker to type checkers)
+- `ruff format --check` step added to CI before lint
+- `CODECOV_TOKEN` env var wired to Codecov upload step
+- `[tool.ruff.format]` block in `pyproject.toml` (double quotes, space indent)
+- `[tool.ruff.lint.per-file-ignores]`: `F401` suppressed in `__init__.py`, `S101` in `tests/`
+- `py.typed` explicitly listed in `[tool.hatch.build.targets.wheel]` include
+- `mypy` extended with `warn_return_any`, `warn_unused_configs`, `show_error_codes`
+
+### Fixed
+- `httpx` dev dependency bumped to `>=0.28.1` (security + API compat)
+- `pytest-asyncio` bumped to `>=1.4.0` (resolves deprecation warnings in async fixtures)
+- `anyio` bumped to `>=4.14.2`
+- `typer` bumped to `>=0.27.0`
+- `pytest` bumped to `>=9.1.1`
+
 ## [0.1.0] — 2026-07-31
 
 ### Added
