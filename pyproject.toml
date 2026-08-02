@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcp-forge"
-version = "0.1.0"
+version = "0.1.1"
 description = "The FastAPI-style framework for building MCP servers in Python"
 readme = "README.md"
 license = { text = "MIT" }
@@ -26,30 +26,30 @@ requires-python = ">=3.11"
 dependencies = ["pydantic>=2.13.4"]
 
 [project.optional-dependencies]
-http = ["fastapi>=0.110", "uvicorn[standard]>=0.52.0"]
-sse  = ["fastapi>=0.110", "uvicorn[standard]>=0.52.0"]
+http = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.0"]
+sse  = ["fastapi>=0.141.1", "uvicorn[standard]>=0.52.0"]
 cli  = ["typer>=0.27.0"]
 web  = ["httpx>=0.28.1"]
 dev  = [
     "pytest>=9.1.1",
     "pytest-asyncio>=1.4.0",
     "anyio[trio]>=4.14.2",
-    "fastapi>=0.110",
+    "fastapi>=0.141.1",
     "uvicorn[standard]>=0.52.0",
     "typer>=0.27.0",
     "httpx>=0.28.1",
     "ruff>=0.16.0",
-    "mypy>=1.10",
+    "mypy>=2.3.0",
     "nest-asyncio>=1.6",
 ]
 all = ["mcp-forge[http,sse,cli,web]"]
 
 [project.urls]
-Homepage      = "https://github.com/nsfwbunny/mcp-forge"
-Repository    = "https://github.com/nsfwbunny/mcp-forge"
-Issues        = "https://github.com/nsfwbunny/mcp-forge/issues"
-Documentation = "https://github.com/nsfwbunny/mcp-forge#readme"
-Changelog     = "https://github.com/nsfwbunny/mcp-forge/blob/main/CHANGELOG.md"
+Homepage      = "https://github.com/benni-os/mcp-forge"
+Repository    = "https://github.com/benni-os/mcp-forge"
+Issues        = "https://github.com/benni-os/mcp-forge/issues"
+Documentation = "https://github.com/benni-os/mcp-forge#readme"
+Changelog     = "https://github.com/benni-os/mcp-forge/blob/main/CHANGELOG.md"
 
 [project.scripts]
 mcp-forge = "mcp_forge.cli.main:app"
