@@ -1,20 +1,50 @@
-# ⚡ mcp-forge
+<div align="center">
 
-> The FastAPI-style framework for building MCP servers in Python.
+<br />
 
-[![Python](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue.svg?style=flat-square)](https://www.python.org)
-[![PyPI](https://img.shields.io/pypi/v/mcp-forge.svg?style=flat-square)](https://pypi.org/project/mcp-forge/)
-[![Downloads](https://img.shields.io/pypi/dm/mcp-forge?style=flat-square&color=blue)](https://pypi.org/project/mcp-forge/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=flat-square)](LICENSE)
-[![MCP](https://img.shields.io/badge/protocol-MCP%202024--11--05-purple.svg?style=flat-square)](https://modelcontextprotocol.io)
-[![CI](https://img.shields.io/github/actions/workflow/status/benni-os/mcp-forge/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/benni-os/mcp-forge/actions)
-[![Coverage](https://img.shields.io/codecov/c/github/benni-os/mcp-forge?style=flat-square)](https://codecov.io/gh/benni-os/mcp-forge)
-[![mypy](https://img.shields.io/badge/type--checked-mypy%20strict-informational?style=flat-square)](https://mypy.readthedocs.io)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&style=flat-square)](https://github.com/astral-sh/ruff)
+<img src="https://raw.githubusercontent.com/nsfwbunny/mcp-forge/main/.github/assets/logo.svg" alt="mcp-forge" width="72" />
 
-Stop writing boilerplate MCP servers.
+# mcp-forge
 
-`mcp-forge` is a production-grade framework for the [Model Context Protocol](https://modelcontextprotocol.io) — inspired by FastAPI's declarative style. You define tools as typed Python functions. Schema generation, input validation, and transport wiring are automatic.
+**The FastAPI-style framework for building MCP servers in Python.**
+
+Declarative tools. Auto-schema. Type-safe. Production-ready.
+
+<br />
+
+[![PyPI version](https://img.shields.io/pypi/v/mcp-forge?style=for-the-badge&logo=pypi&logoColor=white&color=0066FF)](https://pypi.org/project/mcp-forge/)
+[![Python](https://img.shields.io/badge/python-3.11_%7C_3.12_%7C_3.13-blue?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org)
+[![CI](https://img.shields.io/github/actions/workflow/status/nsfwbunny/mcp-forge/ci.yml?branch=main&style=for-the-badge&logo=githubactions&logoColor=white&label=CI)](https://github.com/nsfwbunny/mcp-forge/actions)
+[![Coverage](https://img.shields.io/codecov/c/github/nsfwbunny/mcp-forge?style=for-the-badge&logo=codecov&logoColor=white)](https://codecov.io/gh/nsfwbunny/mcp-forge)
+[![License: MIT](https://img.shields.io/badge/license-MIT-22c55e?style=for-the-badge)](LICENSE)
+[![mypy](https://img.shields.io/badge/mypy-strict-6366f1?style=for-the-badge&logo=python&logoColor=white)](https://mypy.readthedocs.io)
+
+<br />
+
+[**Quick Start**](#-quick-start) &nbsp;&bull;&nbsp;
+[**Documentation**](#-features) &nbsp;&bull;&nbsp;
+[**Examples**](#-examples) &nbsp;&bull;&nbsp;
+[**Roadmap**](ROADMAP.md) &nbsp;&bull;&nbsp;
+[**Contributing**](CONTRIBUTING.md)
+
+<br />
+
+<!-- demo gif: replace the src below with your actual recording -->
+<img src="https://raw.githubusercontent.com/nsfwbunny/mcp-forge/main/.github/assets/demo.gif" alt="mcp-forge demo" width="720" />
+
+<br />
+
+</div>
+
+---
+
+## Why mcp-forge?
+
+Every MCP server you write starts the same way: hand-craft JSON Schema, wire a transport loop, handle `notifications/initialized`, redirect stderr, copy-paste validation logic. It's the same boilerplate every time.
+
+**mcp-forge eliminates all of it.** You write a typed Python function. The framework derives the schema from your type hints, validates inputs at runtime, and exposes the tool over any transport — STDIO, HTTP, or SSE — without changing a single line of your logic.
+
+Think of it as the **FastAPI moment for MCP servers**.
 
 ```python
 from mcp_forge import Forge
@@ -23,45 +53,26 @@ app = Forge(name="my-server", version="1.0.0")
 
 @app.tool(description="Search the knowledge base")
 async def search(query: str, limit: int = 10) -> list[dict]:
-    return [{"title": f"Result for {query}"}]  # your logic here
+    """Returns ranked results for the given query."""
+    ...  # your logic here
 
 if __name__ == "__main__":
-    app.run()  # STDIO by default — Claude Desktop / Cursor / VS Code ready
+    app.run()  # STDIO — Claude Desktop / Cursor / VS Code ready
 ```
 
-No JSON schema by hand. No transport boilerplate. No config files.
+No JSON Schema by hand. No transport boilerplate. No config files.
 
 ---
 
-## ✨ Features
-
-| Feature | Description |
-|---|---|
-| **Declarative tools** | `@app.tool()` — auto-infers JSON Schema from Python type hints |
-| **Auto schema** | Pydantic v2 under the hood — full draft-07 JSON Schema generation |
-| **Runtime validation** | Input validated before execution, errors surfaced as MCP-spec errors |
-| **Multi-transport** | STDIO · HTTP (FastAPI) · SSE — switch with one flag |
-| **Async-first** | `async def` and `def` tools work side by side |
-| **Contrib tools** | `memory`, `filesystem`, `web` — production-ready, one-line include |
-| **Testing client** | `ForgeTestClient` — sync and async, no running server needed |
-| **CLI** | `mcp-forge new` · `mcp-forge run --reload` · `mcp-forge list` |
-| **PEP 561 typed** | Ships `py.typed` — full mypy strict / pyright support |
-| **Zero dependencies*** | Core needs only `pydantic>=2.0` — transports are optional extras |
-
-> *Transport extras: `pip install mcp-forge[http]`, `mcp-forge[sse]`, `mcp-forge[all]`*
-
----
-
-## 🚀 Quick Start
+## ⚡ Quick Start
 
 ```bash
 pip install mcp-forge
-mcp-forge new my-server
-cd my-server
+mcp-forge new my-server && cd my-server
 mcp-forge run --reload
 ```
 
-That's a running MCP server. Connect it to Claude Desktop:
+Connect to **Claude Desktop** in 30 seconds:
 
 ```json
 {
@@ -74,90 +85,113 @@ That's a running MCP server. Connect it to Claude Desktop:
 }
 ```
 
----
+Switch to **HTTP** transport with one flag:
 
-## 📐 Architecture
-
+```bash
+mcp-forge run --transport http --port 8080
 ```
-mcp-forge
-├── core/
-│   ├── forge.py          # Forge class — declarative app entrypoint
-│   ├── schema.py         # Auto JSON Schema from Pydantic v2 type hints
-│   ├── validator.py      # Input/output validation engine
-│   ├── config.py         # ForgeConfig dataclass
-│   └── exceptions.py     # MCP-aligned exception hierarchy
-├── transports/
-│   ├── stdio.py          # STDIO — MCP spec 2024-11-05 compliant
-│   ├── http.py           # HTTP — FastAPI-based REST transport
-│   └── sse.py            # SSE — Server-Sent Events streaming transport
-├── cli/
-│   └── main.py           # Typer CLI — new, run, list, build
-└── contrib/
-    ├── memory.py         # In-process memory store (scoped per Forge instance)
-    ├── filesystem.py     # Safe filesystem tools with path sandboxing
-    └── web.py            # HTTP fetch with timeout and error handling
-```
-
-**Design principles:**
-- Transport is a runtime concern — your tool code never changes between STDIO, HTTP, and SSE
-- Schema is derived, never written — if your types are correct, your schema is correct
-- Contrib tools are opt-in — `app.include(memory)` adds 4 tools; you stay in control
 
 ---
 
-## 🔌 Contrib Tools
+## ✨ Features
+
+<table>
+<tr>
+<td width="50%">
+
+**🏗️ Declarative Tools**
+Define tools as typed Python functions with `@app.tool()`. No schema files, no registration calls.
+
+**🧠 Auto JSON Schema**
+Pydantic v2 under the hood. Full draft-07 JSON Schema generated from your type hints — automatically.
+
+**✅ Runtime Validation**
+Inputs validated before execution. Errors surface as proper MCP-spec error responses.
+
+**🚀 Multi-Transport**
+STDIO · HTTP · SSE. Switch transports at runtime — your tool code never changes.
+
+</td>
+<td width="50%">
+
+**⏳ Async-First**
+`async def` and `def` tools work side by side. No event loop management needed.
+
+**🔌 Contrib Routers**
+`memory` · `filesystem` · `web` — production-ready tools, one-line include.
+
+**🧪 Testing Client**
+`ForgeTestClient` calls tools directly — no running server, no mocking, no sockets.
+
+**📦 PEP 561 Typed**
+Ships `py.typed`. Full `mypy --strict` and Pyright support out of the box.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 📚 Examples
+
+### Minimal server — 3 lines of logic
+
+```python
+from mcp_forge import Forge
+
+app = Forge(name="calculator")
+
+@app.tool()
+def add(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
+
+@app.tool()
+def multiply(a: float, b: float) -> float:
+    """Multiply two numbers."""
+    return a * b
+
+app.run()
+```
+
+### With contrib tools
 
 ```python
 from mcp_forge import Forge
 from mcp_forge.contrib import memory, filesystem, web
 
-app = Forge(name="full-server")
+app = Forge(name="agent-tools")
 app.include(memory)      # remember(), recall(), forget(), list_memory()
 app.include(filesystem)  # read_file(), write_file(), list_dir(), delete_file()
 app.include(web)         # fetch_url()
+
+app.run()
 ```
 
-Each contrib router carries its own isolated state. Safe to include in multiple `Forge` instances within the same process.
-
----
-
-## ⚙️ Configuration
+### HTTP transport with custom config
 
 ```python
 from mcp_forge import Forge, ForgeConfig
 
 app = Forge(
-    name="my-server",
-    version="1.0.0",
+    name="api-server",
     config=ForgeConfig(
         transport="http",
         port=8080,
-        log_level="info",
         cors_origins=["*"],
         max_tool_timeout=30,
     ),
 )
+
+@app.tool()
+async def summarize(text: str, max_words: int = 100) -> str:
+    """Summarize text to a given word count."""
+    ...
+
+app.run()
 ```
 
-Or via `mcp-forge.toml` at the project root:
-
-```toml
-[server]
-name = "my-server"
-version = "1.0.0"
-transport = "http"
-port = 8080
-
-[tools]
-max_timeout = 30
-auto_reload = true
-```
-
----
-
-## 🧪 Testing
-
-`ForgeTestClient` calls tools directly — no server, no sockets, no mocking required.
+### Unit testing — no server needed
 
 ```python
 from mcp_forge.testing import ForgeTestClient
@@ -165,53 +199,102 @@ from mcp_forge.testing import ForgeTestClient
 client = ForgeTestClient(app)
 
 def test_add():
-    assert client.call("add", {"a": 2, "b": 3}) == 5
+    result = client.call("add", {"a": 2, "b": 3})
+    assert result == 5
 
-async def test_search_async():
-    results = await client.acall("search", {"query": "mcp"})
-    assert isinstance(results, list)
+async def test_summarize_async():
+    result = await client.acall("summarize", {"text": "Hello world"})
+    assert isinstance(result, str)
 ```
 
-Works with `pytest` and `pytest-asyncio` out of the box.
+---
+
+## 📐 Architecture
+
+```
+mcp-forge
+├── core/
+│   ├── forge.py        ← Forge class — declarative app entrypoint
+│   ├── schema.py       ← Auto JSON Schema from Pydantic v2 type hints
+│   ├── validator.py    ← Input/output validation engine
+│   ├── config.py       ← ForgeConfig dataclass
+│   └── exceptions.py   ← MCP-aligned exception hierarchy
+├── transports/
+│   ├── stdio.py        ← STDIO — MCP spec 2024-11-05 compliant
+│   ├── http.py         ← HTTP — FastAPI-based REST transport
+│   └── sse.py          ← SSE — Server-Sent Events streaming
+├── cli/
+│   └── main.py         ← Typer CLI — new, run, list, build
+└── contrib/
+    ├── memory.py       ← Scoped in-process memory store
+    ├── filesystem.py   ← Safe filesystem tools with path sandboxing
+    └── web.py          ← HTTP fetch with timeout and error handling
+```
+
+**Design principles:**
+
+- **Transport is a runtime concern** — your tool code never changes between STDIO, HTTP, and SSE
+- **Schema is derived, never written** — if your types are correct, your schema is correct
+- **Contrib is opt-in** — `app.include(memory)` adds tools; you stay in control
+- **Strict by default** — mypy strict, ruff format + lint, 100% typed public API
 
 ---
 
 ## 🌍 Ecosystem Compatibility
 
 | Client | Transport | Status |
-|---|---|---|
+|:--|:--|:--|
 | Claude Desktop | STDIO | ✅ Tested |
 | Cursor | STDIO | ✅ Tested |
 | VS Code (GitHub Copilot) | STDIO · HTTP | ✅ Tested |
 | Continue.dev | HTTP · SSE | ✅ Tested |
 | Custom LLM agents | HTTP · SSE | ✅ Tested |
-| JARVAS-2 (Benni OS) | HTTP · STDIO | ✅ Tested |
+
+---
+
+## 📦 Installation
+
+```bash
+# Core only (STDIO transport)
+pip install mcp-forge
+
+# With HTTP + SSE transports
+pip install "mcp-forge[http]"
+
+# Everything
+pip install "mcp-forge[all]"
+```
+
+**Requires:** Python 3.11+ &nbsp;·&nbsp; pydantic>=2.0
 
 ---
 
 ## 🤝 Contributing
 
-PRs welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+Contributions are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
 
 ```bash
-git clone https://github.com/benni-os/mcp-forge
+git clone https://github.com/nsfwbunny/mcp-forge
 cd mcp-forge
 pip install -e ".[dev]"
 pytest
 ```
 
-Found a bug? [Open an issue](https://github.com/benni-os/mcp-forge/issues/new/choose).  
-Have an idea? [Start a discussion](https://github.com/benni-os/mcp-forge/discussions).
+- 🐛 **Found a bug?** → [Open an issue](https://github.com/nsfwbunny/mcp-forge/issues/new?template=bug_report.md)
+- 💡 **Have an idea?** → [Start a discussion](https://github.com/nsfwbunny/mcp-forge/discussions)
+- 📜 **See what's planned** → [ROADMAP.md](ROADMAP.md)
 
 ---
 
-## 📄 License
+<div align="center">
 
-MIT — see [LICENSE](LICENSE).
+<br />
 
----
+Built by [**Benni Alencar**](https://github.com/nsfwbunny) &nbsp;&middot;&nbsp;
+Part of the **Benni OS** open-source ecosystem
 
-<p align="center">
-  Part of the <strong>Benni OS</strong> open source ecosystem &mdash;
-  built and maintained by <a href="https://github.com/benni-os">@benni-os</a>
-</p>
+<br />
+
+<sub>If mcp-forge saves you time, consider giving it a ⭐</sub>
+
+</div>
